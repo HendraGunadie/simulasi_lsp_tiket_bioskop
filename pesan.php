@@ -1,10 +1,24 @@
 <?php
+session_start();
+
+$idx = (int)($_GET['idx'] ?? -1);
+$tiketTersedia = $_SESSION['stok'][$idx] ?? 0;
+
 $judul = $_GET['film'] ?? '';
 $img   = $_GET['img'] ?? '';
 $admin = 2500;
 
 $datapesanan = [];
 $total = 0;
+
+if ($tiketTersedia <= 0) {
+    echo "<script>
+        alert('Maaf tiket sudah habis!');
+        window.location.href='index.php';
+    </script>";
+    exit;
+}
+
 
 if (isset($_POST['hitung']) || isset($_POST['pesan'])) {
 
@@ -29,9 +43,22 @@ if (isset($_POST['hitung']) || isset($_POST['pesan'])) {
     }
 
     if (isset($_POST['pesan'])) {
+        if ($tiket > $tiketTersedia) {
+            echo "<script>
+                alert('Tiket tidak cukup!');
+                window.history.back();
+            </script>";
+            exit;
+        }
+
+
+        $_SESSION['stok'][$idx] -= $tiket;
+        $tiketTersedia = $_SESSION['stok'][$idx];
+
         $datapesanan = [
             "film"   => $judul,
             "jam"    => $jam,
+            "tiketTersedia" => $tiketTersedia,
             "ruangan"=> $ruangan == 150000 ? "VIP" : "Reguler",
             "tiket"  => $tiket,
             "admin"  => $biayaAdmin,
@@ -56,7 +83,9 @@ if (isset($_POST['hitung']) || isset($_POST['pesan'])) {
 <form method="post">
 <img src="<?= $img ?>" height="350" class="d-block mx-auto rounded">
 
-<h3 class="text-center mt-4">Pesan Tiket - <?= $judul ?></h3>
+<h3 class="text-center mt-4">Pesan Tiket - <?= $judul ?></h3> <br>
+
+<p>Tiket Tersedia: <?= $tiketTersedia ?></p>
 
 <label class="form-label mt-3">Jam Tayang</label><br>
 <?php foreach (["12:00","16:00","18:00"] as $j): ?>

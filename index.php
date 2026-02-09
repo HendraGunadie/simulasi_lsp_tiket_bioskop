@@ -1,10 +1,17 @@
 <?php 
 
+session_start();
+
 $daftarFilm = [
-    ["Avanger: Endgame", "https://i.pinimg.com/1200x/95/26/68/9526684fe11e38cf6bb6fbd48e37de6a.jpg"],
-    ["Spider-Man: No Way Home", "https://i.pinimg.com/1200x/6c/3c/e2/6c3ce2cd84134fb3d4bafb82f4f44834.jpg"],
-    ["The Batman", "https://i.pinimg.com/736x/51/26/08/512608d675fd98fca4105f90ab7d6d5c.jpg"]
-]
+    ["Avanger: Endgame", "https://i.pinimg.com/1200x/95/26/68/9526684fe11e38cf6bb6fbd48e37de6a.jpg", 15],
+    ["Spider-Man: No Way Home", "https://i.pinimg.com/1200x/6c/3c/e2/6c3ce2cd84134fb3d4bafb82f4f44834.jpg", 23],
+    ["The Batman", "https://i.pinimg.com/736x/51/26/08/512608d675fd98fca4105f90ab7d6d5c.jpg", 17]
+];
+
+if (!isset($_SESSION['stok'])) {
+    // simpan stok awal sekali saja
+    $_SESSION['stok'] = array_column($daftarFilm, 2); // [15,23,17]
+}
 
 ?>
 
@@ -59,7 +66,17 @@ $daftarFilm = [
             <img src="<?=  $tampil[1] ?>" height="500px" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title"><?= $tampil[0] ?></h5>
-                <a href="pesan.php?film=<?= urlencode($tampil[0]) ?>&img=<?= urlencode($tampil[1]) ?>"><button type="button" class="btn btn-warning">Pesan Tiket</button></a>
+                <p>Tiket Tersedia: <?= $_SESSION['stok'][$daftarFilms] ?></p>
+             <?php if ($_SESSION['stok'][$daftarFilms] > 0): ?>
+                <a href="pesan.php?idx=<?= $daftarFilms ?>&film=<?= urlencode($tampil[0]) ?>&img=<?= urlencode($tampil[1]) ?>">
+                    <button type="button" class="btn btn-warning">Pesan Tiket</button>
+                </a>
+                <?php else: ?>
+                    <button type="button" class="btn btn-secondary" disabled>
+                        Tiket Habis
+                    </button>
+                <?php endif; ?>
+
             </div>
             </div>
         </div>
